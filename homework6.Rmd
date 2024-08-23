@@ -1,0 +1,231 @@
+---
+title: "Homework 6: R Basics"
+output: html_document
+---
+
+Though not necessary, we can increase the chances
+that your script will be reproducible if we set the seed for 
+our random number generator.  Leave this code unchanged
+
+```{r setSeed}
+set.seed(1)
+```
+
+
+# The binomial distribution
+
+The binomial distribution $\mathrm{Binomial}(n,p)$ is defined by the number of successes in $n$ independent trials, each have probability $p$ of success. Think of flipping a coin $n$ times, where the coin is weighted to have probability $p$ of landing on heads.
+
+The R function 'rbinom' generates random variables with a binomial distribution:  (note that you don't need to name these arguments)
+
+```{r example}
+rbinom(n=20, size=10, prob=0.5)
+```
+
+produces 20 independent observations from the $\mathrm{Binomial}(10,0.5)$ distribution
+
+
+# Problem 1 (15 pts)
+
+## Problem 1.1 
+
+Generate 500 random values from the $\mathrm{Binomial}(15,0.5)$ distribution, and store them in a vector called 'binomialDraws' 
+
+Extract and display the first 10 items and then the last 10 items 
+
+```{r q11}
+###
+binomialDraws = rbinom(500, size = 15, prob = 0.5)
+###
+binomialDraws[1:10] # First 10 items
+tail(binomialDraws, 10) # Last 10 items
+```
+
+
+## Problem 1.2
+
+Find the data type of the items in 'binomialDraws' using 'typeof'
+
+Convert it to a vector of characters, storing this as a new vector 'binomialDrawsChar'
+
+```{r q12}
+##
+typeof(binomialDraws)
+binomialDrawsChar = as.character(binomialDraws)
+```
+#### Leave this code unchanged:
+
+```{r q12answer}
+#typeof(binomialDrawsChar)
+```
+
+
+## Problem 1.3
+
+Generate 500 $\mathrm{Binomial}(15,p)$ for each p ranging over 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, and 0.8, storing the results in vectors called 'binomialDraws2', 'binomialDraws3', ..., 'binomialDraws8'
+
+* Form a matrix called 'binomialDrawsMat' with these 7 vectors (in increasing order, referring to p) as its columns using cbind 
+
+* Report the first 5 rows and then the sub matrix that (has the last 5 rows and last 5 columns).  The nrow/ncol functions may be useful.
+
+* Using 'max', find the maximum value of the second column
+
+```{r q13}
+binomialDraws2 = rbinom(500, size = 15, prob = 0.2)
+binomialDraws3 = rbinom(500, size = 15, prob = 0.3)
+binomialDraws4 = rbinom(500, size = 15, prob = 0.4)
+binomialDraws5 = rbinom(500, size = 15, prob = 0.5)
+binomialDraws6 = rbinom(500, size = 15, prob = 0.6)
+binomialDraws7 = rbinom(500, size = 15, prob = 0.7)
+binomialDraws8 = rbinom(500, size = 15, prob = 0.8)
+###################
+# Create matrix binomialDrawsMat
+binomialDrawsMat = cbind(binomialDraws2, binomialDraws3, binomialDraws4, binomialDraws5, binomialDraws6, binomialDraws7, binomialDraws8)
+##
+# First 5 rows
+head(binomialDrawsMat, 5)
+# last 5 rows/last 5columns
+binomialDrawsMat[(nrow(binomialDrawsMat)-4):nrow(binomialDrawsMat),
+                       (ncol(binomialDrawsMat)-4):ncol(binomialDrawsMat)]
+# max of second column
+max(binomialDrawsMat[, 2])
+###
+```
+
+## Problem 1.4
+
+Lastly, compute the column (sample) means and subtract this vector from the vector of known expected values of the binomial (that is, $((\textrm{# trials})*p$)
+
+```{r q14}
+###
+column_means = colMeans(binomialDrawsMat)
+###
+expected_vals = rep(15 * c(0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8))
+expected_vals - column_means
+```
+
+# Problem 2 (15 pts)
+
+## Problem 2.1
+
+Redo problem 1.3 but with 5 million draws from each binomial, accumulating them in a matrix via cbind called 'binomialDrawsBigMat'
+
+Augment 'binomialDrawsBigMat' with the 500 draws from problem 1.3 as new rows.  Report the dimensions of 'binomialDrawsBigMat'
+
+```{r q21}
+binomialBigDraws2 = rbinom(5000000, size = 15, prob = 0.2)
+binomialBigDraws3 = rbinom(5000000, size = 15, prob = 0.3)
+binomialBigDraws4 = rbinom(5000000, size = 15, prob = 0.4)
+binomialBigDraws5 = rbinom(5000000, size = 15, prob = 0.5)
+binomialBigDraws6 = rbinom(5000000, size = 15, prob = 0.6)
+binomialBigDraws7 = rbinom(5000000, size = 15, prob = 0.7)
+binomialBigDraws8 = rbinom(5000000, size = 15, prob = 0.8)
+################
+binomialDrawsBigMat = cbind(binomialBigDraws2, binomialBigDraws3, binomialBigDraws4, binomialBigDraws5, binomialBigDraws6, binomialBigDraws7, binomialBigDraws8)
+#
+binomialDrawsSmallMat <- cbind(binomialDraws2[1:500], binomialDraws3[1:500],
+                               binomialDraws4[1:500], binomialDraws5[1:500],
+                               binomialDraws6[1:500], binomialDraws7[1:500],
+                               binomialDraws8[1:500])
+
+binomialDrawsBigMat <- rbind(binomialDrawsBigMat, binomialDrawsSmallMat)
+##### Repeat question 1.3
+# First 5 rows
+head(binomialDrawsBigMat, 5)
+# last 5 rows/last 5columns
+binomialDrawsBigMat[(nrow(binomialDrawsBigMat)-4):nrow(binomialDrawsBigMat),
+                       (ncol(binomialDrawsBigMat)-4):ncol(binomialDrawsBigMat)]
+# max of second column
+max(binomialDrawsBigMat[, 2])
+dim(binomialDrawsBigMat)
+```
+
+## Problem 2.2
+
+As in problem 1.4,  compute the column (sample) means and subtract this vector from the vector of known expected values of the binomial (that is, $n*p$)
+
+```{r q22}
+###
+bigmat_colmeans = colMeans(binomialDrawsBigMat)
+expected_vals = rep(15 * c(0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8))
+expected_vals - bigmat_colmeans
+```
+
+## Problem 3 (10 pts)
+
+An interesting question is how much space do each of the main containers use in R?  Let's compare the amount of memory each of **matrix**, **data.frame**, **list**, and **vector** take.
+
+Create a dataframe called 'binomialDrawsBigDf' from 'binomialDrawsBigMat'. To do this, we can
+use 'data.frame' of the matrix object 'binomialDrawsBigMat'.  
+
+Then, using 'list', convert 'binomialDrawsBigDf' into a list, calling it 'binomialDrawsBigList'
+
+Compare the size of each object in bytes by using 'object.size' 
+
+(add to your comparison the atomic vector created by using 'unlist' on binomialDrawsBigList as well)
+
+```{r q3}
+###
+# 
+binomialDrawsBigDf   = data.frame(binomialDrawsBigMat)
+binomialDrawsBigList = as.list(binomialDrawsBigDf)
+#
+format(object.size(binomialDrawsBigMat), unit = 'auto')
+format(object.size(binomialDrawsBigDf), unit = 'auto')
+format(object.size(binomialDrawsBigList), unit = 'auto')
+format(object.size(unlist(binomialDrawsBigList)), unit = 'auto')
+###
+```
+(if you want to make your output in a more 'readable' fashion, you can use format(object.size(...), unit = 'auto'))
+
+Is there any substantial difference in these data structures as to memory usage?
+
+When comparing the matrix, dataframe, and list structures, memory using is essentially the same. However, the unlisted atomic vector uses a considerably greater amount of memory than any of the other three data structures
+
+# Problem 4 (10 pts)
+
+## Problem 4.1
+
+Let's create a 10 x 4 matrix of consecutive integers called 'myMat'.  Make sure that these integers increase consecutively along the rows, not columns
+
+```{r q41}
+##
+myMat = matrix(1:40, nrow = 10, byrow = T)
+###
+```
+
+## Problem 4.2
+
+Using logical indexing, modify myMat so that every even number in this matrix is multiplied by  100 every odd number is left alone. This should require just a small bit of code (and the use of the modulus operator \%\% )
+
+```{r q42}
+###
+#
+myMat[myMat %% 2 == 0] = myMat[myMat %% 2 == 0] * 100
+###
+```
+
+#### Leave this code unchanged:
+
+```{r q42answer}
+#myMat
+```
+
+
+## Problem 4.3
+
+Using the 'ifelse' command, return myMat to its original values (note that ifelse vectorizes, try it!)
+
+
+```{r q43}
+###
+#
+myMat = ifelse(myMat %% 2 == 0, myMat / 100, myMat)
+###
+```
+
+#### Leave this code unchanged:
+
+```{r q43answer}
+#myMat
+```
